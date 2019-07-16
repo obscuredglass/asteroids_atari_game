@@ -1,9 +1,11 @@
 // frames per second
 const FPS = 30;
+//friction coefficient of space (0 = no friction, 1 = all the friction)
+const FRICTION = 0.7;
 // ship height in pixels
 const SHIP_SIZE = 30;
 // acceleration of the ship in pixels per second per second
-const SHIP_THRUST = 5; 
+const SHIP_THRUST = 5;
 // turn speed in degrees per second
 const TURN_SPEED = 360;
 
@@ -37,13 +39,13 @@ setInterval(update, 1000 / FPS);
 function keyDown(/** @type {KeyboardEvent} */ ev) {
   switch (ev.keyCode) {
     case 37: // left arrow (rotate left)
-    ship.rot = TURN_SPEED / 180 * Math.PI / FPS;
+      ship.rot = TURN_SPEED / 180 * Math.PI / FPS;
       break;
     case 38: //up arrow (thrust forward)
-    ship.thrusting = true
+      ship.thrusting = true
       break;
     case 39: // right arrow (rotate right)
-    ship.rot = -TURN_SPEED / 180 * Math.PI / FPS;
+      ship.rot = -TURN_SPEED / 180 * Math.PI / FPS;
       break;
     case 40: // down arrow (reverse thrust)
       break;
@@ -53,13 +55,13 @@ function keyDown(/** @type {KeyboardEvent} */ ev) {
 function keyUp(/** @type {KeyboardEvent} */ ev) {
   switch (ev.keyCode) {
     case 37: // left arrow (stop rotating left)
-    ship.rot = 0;
+      ship.rot = 0;
       break;
     case 38: //up arrow (thrust forward)
-    ship.thrusting = true
+      ship.thrusting = true
       break;
     case 39: // right arrow (stop rotating right)
-    ship.rot = 0;
+      ship.rot = 0;
       break;
     case 40: // down arrow (reverse thrust)
       break;
@@ -70,11 +72,34 @@ function update() {
   // draw space
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canv.width, canv.height);
-// thrust the ship
-if (ship.thrusting) {
-  ship.thrust.x += SHIP_THRUST * Math.cos(ship.a);
-  ship.thrust.y -= SHIP_THRUST * Math.sin(ship.a);
-}
+  // thrust the ship
+  if (ship.thrusting) {
+    ship.thrust.x += SHIP_THRUST * Math.cos(ship.a) / FPS;
+    ship.thrust.y -= SHIP_THRUST * Math.sin(ship.a) / FPS;
+    // draw the thruster
+    ctx.fillStyle = "red";
+    ctx.strokeStyle = "yellow";
+    ctx.lineWidth = SHIP_SIZE / 10;
+    ctx.beginPath();
+    ctx.moveTo( // rear left
+      ship.x - ship.r * (2 / 3 * Math.cos(ship.a) + 0.5 * Math.sin(ship.a)),
+      ship.y + ship.r * (2 / 3 * Math.sin(ship.a) - 0.5 * Math.cos(ship.a))
+    );
+    ctx.lineTo( // rear centre (behind the ship)
+      ship.x - ship.r * 5 / 3 * Math.cos(ship.a),
+      ship.y + ship.r * 5 / 3 * Math.sin(ship.a)
+    );
+    ctx.lineTo( // rear right
+      ship.x - ship.r * (2 / 3 * Math.cos(ship.a) - 0.5 * Math.sin(ship.a)),
+      ship.y + ship.r * (2 / 3 * Math.sin(ship.a) + 0.5 * Math.cos(ship.a))
+    );
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  } else {
+    ship.thrust.x -= FRICTION * ship.thrust.x / FPS;
+    ship.thrust.y -= FRICTION * ship.thrust.y / FPS;
+  }
 
   //draw a triangular ship
   ctx.strokeStyle = "white";
@@ -96,12 +121,27 @@ if (ship.thrusting) {
   ctx.stroke();
 
 
+
+
   //rotate ship
   ship.a += ship.rot;
 
   //move the ship
   ship.x += ship.thrust.x;
   ship.y += ship.thrust.y;
+
+  //handle edge of screen
+  if (ship.x < 0 - ship.r) {
+    ship.x = canv.width + ship.r;
+  } else if (ship.x > canv.width + ship.r) {
+    ship.x = 0 - ship.r;
+  }
+
+  if (ship.y < 0 - ship.r) {
+    ship.y = canv.height + ship.r;
+  } else if (ship.y > canv.height + ship.r) {
+    ship.y = 0 - ship.r;
+  }
 
 
   //center dot
