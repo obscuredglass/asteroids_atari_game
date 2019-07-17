@@ -4,6 +4,10 @@ const FPS = 30;
 const FRICTION = 0.7;
 // starting number of asteroids
 const ROIDS_NUM = 3;
+// starting size of asteroids in pixels
+const ROIDS_SIZE = 100;
+// max starting speed of asteoids in pixels per second
+const ROIDS_SPD = 50;
 // ship height in pixels
 const SHIP_SIZE = 30;
 // acceleration of the ship in pixels per second per second
@@ -42,6 +46,8 @@ setInterval(update, 1000 / FPS);
 function createAsteroidBelt() {
   roids = [];
   for (var i = 0; i < ROIDS_NUM; i++) {
+    x = Math.floor(Math.random() * convas.width);
+    y = Math.floor(Math.random() * convas.height);
     roids.push(newAsteroid());
   }
 }
