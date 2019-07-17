@@ -2,6 +2,8 @@
 const FPS = 30;
 // friction coefficient of space (0 = no friction, 1 = lots of friction)
 const FRICTION = 0.7;
+// jaggedness of the asteroids (0 = none, 1 = lots)
+const ROID_JAG = 0.4;
 // starting number of asteroids
 const ROIDS_NUM = 3;
 // starting size of asteroids in pixels
@@ -16,6 +18,8 @@ const SHIP_SIZE = 30;
 const SHIP_THRUST = 5;
 // turn speed in degrees per second
 const SHIP_TURN_SPD = 360;
+// show or hide ship's center dot
+const SHOW_CENTER_DOT = false;
 
 /** @type {HTMLCanvasElement} */
 var canv = document.getElementById("gameCanvas");
@@ -130,7 +134,7 @@ function update() {
       ship.x - ship.r * (2 / 3 * Math.cos(ship.a) + 0.5 * Math.sin(ship.a)),
       ship.y + ship.r * (2 / 3 * Math.sin(ship.a) - 0.5 * Math.cos(ship.a))
     );
-    ctx.lineTo( // rear centre (behind the ship)
+    ctx.lineTo( // rear center (behind the ship)
       ship.x - ship.r * 5 / 3 * Math.cos(ship.a),
       ship.y + ship.r * 5 / 3 * Math.sin(ship.a)
     );
@@ -214,8 +218,8 @@ function update() {
     }
   }
 
-  // centre dot
-  if (SHOW_CENTRE_DOT) {
+  // center dot
+  if (SHOW_CENTER_DOT) {
     ctx.fillStyle = "red";
     ctx.fillRect(ship.x - 1, ship.y - 1, 2, 2);
   }
